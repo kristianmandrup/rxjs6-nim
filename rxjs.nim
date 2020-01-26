@@ -109,7 +109,6 @@ proc accept*(notification: Notification, observer: Observer)
 proc do*(notification: Notification, next: proc(value: auto))
 proc do*(notification: Notification, next: proc(value: auto), error: proc(err: auto))
 proc do*(notification: Notification, next: proc(value: auto), error: proc(err: auto), complete: proc())
-{.pop.}
 
 # Factories
 
@@ -203,11 +202,11 @@ proc webSocket*(urlConfigOrSource: auto): WebSocketSubject
 # Operators
 
 proc combineAll*(project: varargs[auto]): auto
-proc concatAll*(observable: Observable): auto
+proc concatAll*(): auto
 proc combineLatest*(observables: varargs[auto]): auto
-proc switchAll*(observable: Observable): auto
-proc mergeAll*(observable: Observable, number: cint): auto
-proc exhaust*(observable: Observable): auto
+proc switchAll*(): auto
+proc mergeAll*(number: cint): auto
+proc exhaust*(): auto
 
 proc concatMap*(project: auto): auto
 proc concatMap*(project: auto, resultSelector: auto): auto
@@ -220,3 +219,44 @@ proc mergeMap*(project: auto, resultSelector: auto): auto
 proc mergeMap*(project: auto, resultSelector: auto, concurrent: auto): auto
 
 proc concat*(observable: Observable, observable: varargs[auto]): auto
+
+proc withLatestFrom*(args: varargs[auto]): auto
+
+proc sequenceEqual*(compareTo: Observable, comparator: proc(a: auto, b: auto): auto): auto
+
+proc count*(predicate: proc(value: auto, number: cint, source: Observable): auto): auto
+proc skip*(count: cint): auto
+
+proc mergeScan*(accumulator: proc(acc: auto, varargs[auto]): auto, seed: auto): auto
+proc mergeScan*(accumulator: proc(acc: auto, varargs[auto]): auto, seed: auto, concurrent: cint): auto
+
+proc empty*(): auto
+proc empty*(scheduler: SchedulerLike): auto
+
+proc isEmpty*(): auto
+proc range*(start: cint): Observable
+proc range*(start: cint, count: cint): Observable
+proc range*(start: cint, count: cint, scheduler: SchedulerLike): Observable
+
+proc reduce*(accumulator: proc(acc: auto, varargs[auto]): auto): auto
+proc reduce*(accumulator: proc(acc: auto, varargs[auto]): auto, seed: auto): auto
+
+proc repeat*(): auto
+proc repeat*(count: cint): auto
+
+proc skipLast*(count: cint): auto
+proc skipUntil*(notifier: Observable): auto
+
+proc skipWhile*(predicate: proc(value: auto, number: cint): auto): auto
+proc take*(count: cint): auto
+proc takeLast*(count: cint): auto
+proc takeUntil*(notifier: Observable): auto
+
+proc takeWhile*(predicate: proc(value: auto, number: cint): auto): auto
+proc takeWhile*(predicate: proc(value: auto, number: cint): auto, inclusive: auto): auto
+
+proc filter*(predicate: proc(value: auto, number: cint): auto): auto
+proc filter*(predicate: proc(value: auto, number: cint): auto, thisArg: auto): auto
+
+proc webSocket*(urlConfigOrSource: auto): auto
+{.pop.}
