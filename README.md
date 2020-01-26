@@ -29,58 +29,98 @@ proc createSubscriber*(next: proc(value: auto), error: proc(err: auto), complete
 proc createReplaySubject*(bufferSize: cint, windowTime: cint): ReplaySubject
 ```
 
-## TODO: functions
+## Functions
 
-```txt
-from<T>(input: any, scheduler?: SchedulerLike): Observable<T>
+Bindings exist for the following functions (not yet tested)
 
-fromEvent<T>(target: FromEventTarget<T>, eventName: string, options?: EventListenerOptions | ((...args: any[]) => T), resultSelector?: (...args: any[]) => T): Observable<T>
+```nim
+proc from*(input: auto): Observable
+proc from*(input: auto, scheduler: SchedulerLike): Observable
 
+proc fromEvent*(target: auto, eventName: cstring): Observable
+proc fromEvent*(target: auto, eventName: cstring, options: auto): Observable
+proc fromEvent*(target: auto, eventName: cstring, options: auto, resultSelector: proc(varargs): Observable
 
-forkJoin(...sources: any[]): Observable<any>
+proc forkJoin*(sources: varargs[auto]): Observable
+proc merge*(observables: varargs[auto]): Observable
 
-merge<T, R>(...observables: any[]): Observable<R>
+proc of*(args: varargs[auto]): Observable
 
-of<T>(...args: (SchedulerLike | T)[]): Observable<T>
+proc generate*(initialStateOrOptions: auto): Observable
+proc generate*(initialStateOrOptions: auto, condition: auto): Observable
+proc generate*(initialStateOrOptions: auto, condition: auto, iterate: auto): Observable
+proc generate*(initialStateOrOptions: auto, condition: auto, iterate: auto, resultSelectorOrObservable: auto): Observable
+proc generate*(initialStateOrOptions: auto, condition: auto, iterate: auto, resultSelectorOrObservable: auto, scheduler: SchedulerLike): Observable
 
-generate<T, S>(initialStateOrOptions: S | GenerateOptions<T, S>, condition?: ConditionFunc<S>, iterate?: IterateFunc<S>, resultSelectorOrObservable?: SchedulerLike | ResultFunc<S, T>, scheduler?: SchedulerLike): Observable<T>
+proc defer*(observableFactory: proc(): auto): Observable
+proc concat*(observables: varargs[auto]): Observable
 
-defer<R extends ObservableInput<any> | void>(observableFactory: () => R): Observable<ObservedValueOf<R>>
+proc interval*(period: cint, scheduler: SchedulerLike): Observable
 
-concat<O extends ObservableInput<any>, R>(...observables: (SchedulerLike | O)[]): Observable<ObservedValueOf<O> | R>
+proc partition*(source: any, predicate: proc(value: auto, index: cint): auto): auto
+proc partition*(source: any, predicate: proc(value: auto, index: cint): auto, thisArg: auto): auto
 
-interval(period: number = 0, scheduler: SchedulerLike = async): Observable<number>
+proc range*(start: cint): Observable
+proc range*(start: cint, count: cint): Observable
+proc range*(start: cint, count: cint, scheduler: SchedulerLike): Observable
 
-partition<T>(source: any, predicate: (value: T, index: number) => boolean, thisArg?: any): [Observable<T>, Observable<T>]
+proc timer*(dueTime: auto, periodOrScheduler: auto): Observable
+proc timer*(dueTime: auto, periodOrScheduler: auto, scheduler: SchedulerLike): Observable
 
-range(start: number = 0, count?: number, scheduler?: SchedulerLike): Observable<number>
+proc pipe*(fns: varargs[auto]): auto
 
-timer(dueTime: number | Date = 0, periodOrScheduler?: number | SchedulerLike, scheduler?: SchedulerLike): Observable<number>
+proc scheduled*(input: auto, scheduler: auto): Observable
 
-pipe(...fns: UnaryFunction<any, any>[]): UnaryFunction<any, any>
+proc using*(resourceFactory: auto, observableFactory: auto): Observable
 
-scheduled<T>(input: any, scheduler: any): Observable<T>
+proc combineLatest*(observables: varargs[auto]): Observable
 
-using<T>(resourceFactory: () => void | Unsubscribable, observableFactory: (resource: void | Unsubscribable) => any): Observable<T>
+proc isObservable*(obj: auto): Observable
 
-combineLatest<O extends ObservableInput<any>, R>(...observables: (SchedulerLike | O | ((...values: ObservedValueOf<O>[]) => R))[]): Observable<R>
+proc pairs*(obj: ref object): Observable
+proc pairs*(obj: ref object, scheduler: SchedulerLike): Observable
 
-isObservable<T>(obj: any): obj is Observable<T>
+proc race*(observables: varargs[auto]): Observable
 
-pairs<T>(obj: Object, scheduler?: SchedulerLike): Observable<[string, T]>
+proc throwError(error: auto): Observable
+proc throwError(error: auto, scheduler: SchedulerLike): Observable
 
-race<T>(...observables: any[]): Observable<T>
+proc zip*(observables: varargs[auto]): Observable
 
-throwError(error: any, scheduler?: SchedulerLike): Observable<never>
+proc fromFetch*(input: auto): Observable
+proc fromFetch*(input: auto, init: auto): Observable
 
-zip<O extends ObservableInput<any>, R>(...observables: (O | ((...values: ObservedValueOf<O>[]) => R))[]): Observable<ObservedValueOf<O>[] | R>
+proc webSocket*(urlConfigOrSource: auto): WebSocketSubject
+```
 
-fromFetch(input: string | Request, init?: RequestInit): Observable<Response>
+## Operators
 
-webSocket<T>(urlConfigOrSource: string | WebSocketSubjectConfig<T>): WebSocketSubject<T>
+Bindings exists for the following operators (not yet tested)
+
+```nim
+proc combineAll*(project: varargs[auto]): auto
+proc concatAll*(observable: Observable): auto
+proc combineLatest*(observables: varargs[auto]): auto
+proc switchAll*(observable: Observable): auto
+proc mergeAll*(observable: Observable, number: cint): auto
+proc exhaust*(observable: Observable): auto
+
+proc concatMap*(project: auto): auto
+proc concatMap*(project: auto, resultSelector: auto): auto
+
+proc concatMapTo*(innerObservable: auto): auto
+proc concatMapTo*(innerObservable: auto, resultSelector: auto): auto
+
+proc mergeMap*(project: auto): auto
+proc mergeMap*(project: auto, resultSelector: auto): auto
+proc mergeMap*(project: auto, resultSelector: auto, concurrent: auto): auto
+
+proc concat*(observable: Observable, observable: varargs[auto]): auto
 ```
 
 ## TODO: Operators
+
+The operators are essential to RxJS. Please help out adding them to the library and testing them out.
 
 ```txt
 audit
