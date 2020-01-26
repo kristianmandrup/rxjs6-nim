@@ -199,7 +199,7 @@ proc fromFetch*(input: auto, init: auto): Observable
 
 proc webSocket*(urlConfigOrSource: auto): WebSocketSubject
 
-# Operators
+# Operators: See https://rxjs.dev/api/operators
 
 proc combineAll*(project: varargs[auto]): auto
 proc concatAll*(): auto
@@ -245,6 +245,8 @@ proc reduce*(accumulator: proc(acc: auto, varargs[auto]): auto, seed: auto): aut
 proc repeat*(): auto
 proc repeat*(count: cint): auto
 
+proc repeatWhen*(notifier: proc(notifications: Observable): Observable): auto
+
 proc skipLast*(count: cint): auto
 proc skipUntil*(notifier: Observable): auto
 
@@ -269,8 +271,14 @@ proc auditTime*(duration: cint, scheduler: auto): auto
 proc throttle*(durationSelector: proc(value: auto): auto): auto
 proc throttle*(durationSelector: proc(value: auto): auto, config: ref object of RootObj): auto
 
+proc throttleTime*(duration: cint): auto
+proc throttleTime*(duration: cint, scheduler: auto): auto
+proc throttleTime*(duration: cint, scheduler: auto, configL ref object of RootObj): auto
+
 proc sample*(notifier: Observable): auto
 proc debounce*(durationSelector: proc(value: auto): auto): auto
+
+proc debounceTime*(dueTime: cint, scheduler: auto): auto
 
 proc delayWhen*(delayDurationSelector: proc(value: auto, index: cint): auto): auto
 proc delayWhen*(delayDurationSelector: proc(value: auto, index: cint): auto, subscriptionDelay: Observable): auto
@@ -295,6 +303,15 @@ proc tap*(nextOrObserver: auto, error: auto): auto
 proc tap*(nextOrObserver: auto, error: auto, complete: auto): auto
 
 proc publish*(selector: auto): auto
+proc publishLast*(): auto
+proc publishBehavior*(value: auto): auto
+
+proc publishReplay*(): auto
+proc publishReplay*(bufferSize: cint): auto
+proc publishReplay*(bufferSize: cint, windowTime: cint): auto
+proc publishReplay*(bufferSize: cint, windowTime: cint, selectorOrScheduler: auto): auto
+proc publishReplay*(bufferSize: cint, windowTime: cint, selectorOrScheduler: auto, scheduler: auto): auto
+
 proc materialize*(): auto
 proc catchError*(selector: proc(err: auto, caught: Observable): auto): auto
 proc onErrorResumeNext*(nextSources: varargs[auto]): auto
@@ -303,9 +320,39 @@ proc window*(windowBoundaries: Observable): auto
 proc elementAt*(index: cint): auto
 proc elementAt*(index: cint, defaultValue: auto): auto
 
-proc every*(predicate: predicate: proc(value: auto, index: cint): auto): auto
-proc every*(predicate: predicate: proc(value: auto, index: cint): auto, thisArg: auto): auto
+proc every*(predicate: proc(value: auto, index: cint): auto): auto
+proc every*(predicate: proc(value: auto, index: cint): auto, thisArg: auto): auto
 
 proc min*(comparer: proc(x: auto, y: auto): auto): auto
 proc max*(comparer: proc(x: auto, y: auto): auto): auto
+
+proc last*(predicate: proc(value: auto, index: cint): auto): auto
+proc last*(predicate: proc(value: auto, index: cint): auto, defaultValue: auto): auto
+
+proc distinct*(keySelector: auto): auto
+proc distinct*(keySelector: auto, flushes: Observable): auto
+
+proc distinctUntilChanged*(compare: proc(x: auto, y: auto): auto): auto
+proc distinctUntilChanged*(compare: proc(x: auto, y: auto): auto, keySelector: auto): auto
+
+proc distinctUntilKeyChanged*(key: auto): auto
+proc distinctUntilKeyChanged*(key: auto, compare: proc(x: auto, y: auto): auto): auto
+
+proc defaultIfEmpty*(defaultValue: auto): auto
+
+proc find*(predicate: proc(value: auto, index: cint, source: auto): auto)
+proc find*(predicate: proc(value: auto, index: cint, source: auto, thisArg: auto): auto)
+
+proc findIndex*(predicate: proc(value: auto, index: cint, source: auto): auto)
+proc findIndex*(predicate: proc(value: auto, index: cint, source: auto, thisArg: auto): auto)
+
+proc first*(predicate: proc(value: auto, index: cint, source: auto): auto)
+proc first*(predicate: proc(value: auto, index: cint, source: auto, defaultValue: auto): auto)
+
+proc single*(predicate: proc(value: auto, index: cint, source: auto): auto)
+
+proc multicast*(subjectOrSubjectFactory: auto, selector: proc(source: Observable): Observable): auto
+
+proc observeOn*(scheduler: SchedulerLike): auto
+proc observeOn*(scheduler: SchedulerLike, delay: cint): auto
 {.pop.}
