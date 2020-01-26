@@ -3,7 +3,7 @@ import macros, dom, jsffi
 {.experimental: "callOperator".}
 
 when not defined(js):
-  {.error: "React.nim is only available for the JS target".}
+  {.error: "RxJS.nim is only available for the JS target".}
 
 type
   Operator = ref object of RootObj    
@@ -107,5 +107,29 @@ proc do*(notification: Notification, next: proc(value: auto), error: proc(err: a
 
 # Factories
 
+proc createObservable*(subscribe: proc(varargs): auto): Observable =
+  Observable.create(subscribe)
+
+proc createConnectableObservable*(subscribe: proc(varargs): auto): ConnectableObservable =
+  ConnectableObservable.create(subscribe)
+    
+proc createGroupedObservable*(key: auto, groupSubject: Subject): GroupedObservable =
+  GroupedObservable.create(key, groupSubject)
+    
+proc createAsyncSubject*(subscriber: Subscriber): AsyncSubject =
+  AsyncSubject.create(subscriber)
+
+proc createBehaviorSubject*(value: auto): BehaviorSubject =
+  BehaviorSubject.create(value)
+    
+proc createSubscriber*(next: proc(value: auto)): Subscriber =
+  Subscriber.create(next)  
+
+proc createSubscriber*(next: proc(value: auto), error: proc(err: auto)): Observable =
+  Subscriber.create(next, error)  
+  
+proc createSubscriber*(next: proc(value: auto), error: proc(err: auto), complete: proc()): Observable =
+  Subscriber.create(next, error, complete)  
+  
 proc createReplaySubject*(bufferSize: cint, windowTime: cint): ReplaySubject =
   ReplaySubject.create(bufferSize, windowTime)
