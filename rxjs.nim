@@ -207,6 +207,7 @@ proc combineLatest*(observables: varargs[auto]): auto
 proc switchAll*(): auto
 proc mergeAll*(number: cint): auto
 proc exhaust*(): auto
+proc pairwise*(): auto
 
 proc concatMap*(project: auto): auto
 proc concatMap*(project: auto, resultSelector: auto): auto
@@ -259,4 +260,52 @@ proc filter*(predicate: proc(value: auto, number: cint): auto): auto
 proc filter*(predicate: proc(value: auto, number: cint): auto, thisArg: auto): auto
 
 proc webSocket*(urlConfigOrSource: auto): auto
+
+proc audit*(durationSelector: proc(value: auto): auto): auto
+
+proc auditTime*(duration: cint): auto
+proc auditTime*(duration: cint, scheduler: auto): auto
+
+proc throttle*(durationSelector: proc(value: auto): auto): auto
+proc throttle*(durationSelector: proc(value: auto): auto, config: ref object of RootObj): auto
+
+proc sample*(notifier: Observable): auto
+proc debounce*(durationSelector: proc(value: auto): auto): auto
+
+proc delayWhen*(delayDurationSelector: proc(value: auto, index: cint): auto): auto
+proc delayWhen*(delayDurationSelector: proc(value: auto, index: cint): auto, subscriptionDelay: Observable): auto
+
+proc pluck*(properties: varargs[cstring]): auto
+
+proc map*(project: proc(value: auto, index: cint): auto): auto
+proc map*(project: proc(value: auto, index: cint): auto, thisArg: auto): auto
+
+proc switchMap*(project: proc(value: auto, index: cint): auto): auto
+proc switchMap*(project: proc(value: auto, index: cint): auto, resultSelector: auto): auto
+
+proc flatMap*(project: proc(value: auto, index: cint): auto): auto
+proc flatMap*(project: proc(value: auto, index: cint): auto, resultSelector: auto): auto
+proc flatMap*(project: proc(value: auto, index: cint): auto, resultSelector: auto, concurrent: cint): auto
+
+proc groupBy*(keySelector: proc(value: auto): auto, elementSelector: auto, durationSelector: auto, subjectSelector: auto): auto
+
+proc tap*(): auto
+proc tap*(nextOrObserver: auto): auto
+proc tap*(nextOrObserver: auto, error: auto): auto
+proc tap*(nextOrObserver: auto, error: auto, complete: auto): auto
+
+proc publish*(selector: auto): auto
+proc materialize*(): auto
+proc catchError*(selector: proc(err: auto, caught: Observable): auto): auto
+proc onErrorResumeNext*(nextSources: varargs[auto]): auto
+proc window*(windowBoundaries: Observable): auto
+
+proc elementAt*(index: cint): auto
+proc elementAt*(index: cint, defaultValue: auto): auto
+
+proc every*(predicate: predicate: proc(value: auto, index: cint): auto): auto
+proc every*(predicate: predicate: proc(value: auto, index: cint): auto, thisArg: auto): auto
+
+proc min*(comparer: proc(x: auto, y: auto): auto): auto
+proc max*(comparer: proc(x: auto, y: auto): auto): auto
 {.pop.}
