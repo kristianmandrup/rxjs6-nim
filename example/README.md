@@ -1,6 +1,6 @@
-# Sample Nim React app
+# Sample Nim RxJS app
 
-This sample Nim React app aims to demonstrate how to use React 16.x with Hooks using Nim 1.0.
+This sample Nim RxJs app aims to demonstrate how to use React 16.x with Hooks using Nim 1.0.
 
 ## Build
 
@@ -8,11 +8,13 @@ This sample Nim React app aims to demonstrate how to use React 16.x with Hooks u
 
 ## Run
 
-Open `index.html` in the browser
-
-`open index.html`
+`npm test`
 
 ## Javascript libraries used
 
-- Bootstrap 4.4.1
 - RxJs 6.5.4
+- Jest 25.1
+
+## TODO
+
+Use [Jest Nim bindings](https://github.com/kristianmandrup/jest-nim) for testing RxJs bindings work as expected
