@@ -6,17 +6,17 @@ when not defined(js):
   {.error: "RxJS.nim is only available for the JS target".}
 
 type
-  SchedulerLike = ref object of RootObj
-  Operator = ref object of RootObj    
-  Observer = ref object of RootObj    
+  SchedulerLike = JsObject
+  Operator = JsObject
+  Observer = JsObject
     closed*  
-  Subscribable = ref object of RootObj    
+  Subscribable = JsObject
   Observable{.importc.} = ref object of Subscribable
     source*: Observable,
     operator*: Operator,
     
   Subject{.importc.} = ref object of Observable
-    observers*: array[Observer],
+    observers*: seq[Observer],
     isStopped*,
     hasError*,
     thrownError*
@@ -35,14 +35,14 @@ type
   
   ReplaySubject{.importc.} = ref object of Subject
   Subscriber{.importc.} = ref object of Subscription
-  Subscription{.importc.} = ref object of RootObj
+  Subscription{.importc.} = JsObject
     closed*    
-  VirtualTimeScheduler{.importc.} = ref object of RootObj
+  VirtualTimeScheduler{.importc.} = JsObject
     frame*: cint,
     index*: cint,
     maxFrames*: cint
 
-  AjaxResponse{.importc.} = ref object of RootObj
+  AjaxResponse{.importc.} = JsObject
     status*,
     response*,
     responseText*,
@@ -51,17 +51,17 @@ type
     xhr*,
     request*
   WebSocketSubject{.importc.} = ref object of Subject  
-  TestScheduler{.importc.} = ref object of RootObj
+  TestScheduler{.importc.} = JsObject
     hotObservables*,
     coldObservables*,
 
 {.push importcpp.}
 proc now(scheduler: SchedulerLike): number
-proc schedule(scheduler: SchedulerLike, work: proc (action: SchedulerAction, varargs[auto])): Subscription  
-proc schedule(scheduler: SchedulerLike, work: proc (action: SchedulerAction, varargs[auto]), delay?: number): Subscription  
-proc schedule(scheduler: SchedulerLike, work: proc (action: SchedulerAction, varargs[auto]), delay: cint, state: auto): Subscription  
+proc schedule(scheduler: SchedulerLike, work: proc (action: SchedulerAction, args: varargs[auto])): Subscription  
+proc schedule(scheduler: SchedulerLike, work: proc (action: SchedulerAction, args: varargs[auto]), delay: cint): Subscription  
+proc schedule(scheduler: SchedulerLike, work: proc (action: SchedulerAction, args: varargs[auto]), delay: cint, state: auto): Subscription  
 
-proc assertDeepEqual*(scheduler: TestScheduler, proc(actual: auto, expected: auto): auto): auto
+proc assertDeepEqual*(scheduler: TestScheduler, proc(actual: auto, expected: auto): auto): bool
 proc createTime*(scheduler: TestScheduler, marbles: cstring): cint
 proc createColdObservable*(scheduler: TestScheduler, marbles: cstring): ColdObservable
 proc createColdObservable*(scheduler: TestScheduler, marbles: cstring, values: varargs[auto]): ColdObservable
@@ -73,7 +73,7 @@ proc expectObservable*(scheduler: TestScheduler, observable: Observable, subscri
 
 proc expectSubscriptions*(scheduler: TestScheduler, actualSubscriptionLogs: array[auto]): auto
 proc flush(scheduler: TestScheduler)
-proc run*(scheduler: TestScheduler, callback: proc(helpers: auto): auto): auto
+proc run*(scheduler: TestScheduler, callback: proc(helpers: seq[auto]): auto): auto
 
 proc multiplex*(subject: WebSocketSubject, subMsg: proc(), unsubMsg: proc(), messageFilter: proc(value: auto): auto)
 
@@ -112,10 +112,10 @@ proc do*(notification: Notification, next: proc(value: auto), error: proc(err: a
 
 # Factories
 
-proc createObservable*(subscribe: proc(varargs): auto): Observable =
+proc createObservable*(subscribe: proc(args: varargs): auto): Observable =
   Observable.create(subscribe)
 
-proc createConnectableObservable*(subscribe: proc(varargs): auto): ConnectableObservable =
+proc createConnectableObservable*(subscribe: proc(args: varargs): auto): ConnectableObservable =
   ConnectableObservable.create(subscribe)
     
 proc createGroupedObservable*(key: auto, groupSubject: Subject): GroupedObservable =
@@ -146,7 +146,7 @@ proc from*(input: auto, scheduler: SchedulerLike): Observable
 
 proc fromEvent*(target: auto, eventName: cstring): Observable
 proc fromEvent*(target: auto, eventName: cstring, options: auto): Observable
-proc fromEvent*(target: auto, eventName: cstring, options: auto, resultSelector: proc(varargs): Observable
+proc fromEvent*(target: auto, eventName: cstring, options: auto, resultSelector: proc(args: varargs): Observable
 
 proc forkJoin*(sources: varargs[auto]): Observable
 proc merge*(observables: varargs[auto]): Observable
@@ -184,15 +184,20 @@ proc combineLatest*(observables: varargs[auto]): Observable
 
 proc isObservable*(obj: auto): Observable
 
-proc pairs*(obj: ref object): Observable
-proc pairs*(obj: ref object, scheduler: SchedulerLike): Observable
+proc pairs*(obj: JsObject): Observable
+proc pairs*(obj: JsObject, scheduler: SchedulerLike): Observable
 
 proc race*(observables: varargs[auto]): Observable
 
+proc toArray*(): auto
+
 proc throwError(error: auto): Observable
 proc throwError(error: auto, scheduler: SchedulerLike): Observable
+proc throwIfEmpty*(errorFactory: proc(): auto): auto
 
 proc zip*(observables: varargs[auto]): Observable
+proc zipAll*(): auto
+proc zipAll*(project: proc(values: vareargs[auto]) => auto): auto
 
 proc fromFetch*(input: auto): Observable
 proc fromFetch*(input: auto, init: auto): Observable
@@ -202,55 +207,66 @@ proc webSocket*(urlConfigOrSource: auto): WebSocketSubject
 # Operators: See https://rxjs.dev/api/operators
 
 proc combineAll*(project: varargs[auto]): auto
-proc concatAll*(): auto
 proc combineLatest*(observables: varargs[auto]): auto
-proc switchAll*(): auto
+
+
 proc mergeAll*(number: cint): auto
 proc exhaust*(): auto
+proc exhaustMap*(project: proc(value: auto, index: cint): auto): auto
+proc exhaustMap*(project: proc(value: auto, index: cint): auto, resultSelector: proc(outerValue: auto, innerValue: auto, outerIndex: cint, innerIndex: cint): auto): auto
 proc pairwise*(): auto
 
+proc concat*(observable: Observable, observable: varargs[auto]): auto
 proc concatMap*(project: auto): auto
 proc concatMap*(project: auto, resultSelector: auto): auto
 
 proc concatMapTo*(innerObservable: auto): auto
 proc concatMapTo*(innerObservable: auto, resultSelector: auto): auto
+proc concatAll*(): auto
 
 proc mergeMap*(project: auto): auto
 proc mergeMap*(project: auto, resultSelector: auto): auto
 proc mergeMap*(project: auto, resultSelector: auto, concurrent: auto): auto
 
-proc concat*(observable: Observable, observable: varargs[auto]): auto
+proc mergeMapTo*(innerObservable: auto, resultSelector: auto)): auto
+proc mergeMapTo*(innerObservable: auto, resultSelector: auto), concurrent: cint): auto
 
 proc withLatestFrom*(args: varargs[auto]): auto
 
 proc sequenceEqual*(compareTo: Observable, comparator: proc(a: auto, b: auto): auto): auto
 
 proc count*(predicate: proc(value: auto, number: cint, source: Observable): auto): auto
-proc skip*(count: cint): auto
 
-proc mergeScan*(accumulator: proc(acc: auto, varargs[auto]): auto, seed: auto): auto
-proc mergeScan*(accumulator: proc(acc: auto, varargs[auto]): auto, seed: auto, concurrent: cint): auto
+proc scan*(accumulator: proc(acc: auto, value: auto, index: cint):auto): auto
+proc scan*(accumulator: proc(acc: auto, value: auto, index: cint):auto, seed: auto): auto
+proc mergeScan*(accumulator: proc(acc: auto, args: varargs[auto]): auto, seed: auto): auto
+proc mergeScan*(accumulator: proc(acc: auto, args: varargs[auto]): auto, seed: auto, concurrent: cint): auto
 
 proc empty*(): auto
 proc empty*(scheduler: SchedulerLike): auto
 
-proc isEmpty*(): auto
+proc isEmpty*(): bool
 proc range*(start: cint): Observable
 proc range*(start: cint, count: cint): Observable
 proc range*(start: cint, count: cint, scheduler: SchedulerLike): Observable
 
-proc reduce*(accumulator: proc(acc: auto, varargs[auto]): auto): auto
-proc reduce*(accumulator: proc(acc: auto, varargs[auto]): auto, seed: auto): auto
+proc reduce*(accumulator: proc(acc: auto, args: varargs[auto]): auto): auto
+proc reduce*(accumulator: proc(acc: auto, args: varargs[auto]): auto, seed: auto): auto
 
 proc repeat*(): auto
 proc repeat*(count: cint): auto
 
 proc repeatWhen*(notifier: proc(notifications: Observable): Observable): auto
 
+proc retry*(count: cint): auto
+proc retryWhen*(notifier: proc(errors: Observable): Observable>):auto
+
+proc skip*(count: cint): auto
 proc skipLast*(count: cint): auto
 proc skipUntil*(notifier: Observable): auto
-
 proc skipWhile*(predicate: proc(value: auto, number: cint): auto): auto
+proc startWith*(schedulers: varargs[auto]): auto
+
 proc take*(count: cint): auto
 proc takeLast*(count: cint): auto
 proc takeUntil*(notifier: Observable): auto
@@ -269,13 +285,21 @@ proc auditTime*(duration: cint): auto
 proc auditTime*(duration: cint, scheduler: auto): auto
 
 proc throttle*(durationSelector: proc(value: auto): auto): auto
-proc throttle*(durationSelector: proc(value: auto): auto, config: ref object of RootObj): auto
+proc throttle*(durationSelector: proc(value: auto): auto, config: JsObject): auto
 
 proc throttleTime*(duration: cint): auto
 proc throttleTime*(duration: cint, scheduler: auto): auto
-proc throttleTime*(duration: cint, scheduler: auto, configL ref object of RootObj): auto
+
+proc throttleTime*(duration: cint, scheduler: auto, config: JsObject): auto
+proc timeInterval*(scheduler: SchedulerLike): auto
+proc timeout*(due: auto, scheduler: SchedulerLike): auto
+proc timeout*(due: auto, withObservable: auto, scheduler: SchedulerLike): auto
+proc timestamp*(scheduler: SchedulerLike): auto
 
 proc sample*(notifier: Observable): auto
+proc sampleTime*(period: number): auto
+proc sampleTime*(period: number, scheduler: SchedulerLike): auto
+
 proc debounce*(durationSelector: proc(value: auto): auto): auto
 
 proc debounceTime*(dueTime: cint, scheduler: auto): auto
@@ -287,9 +311,12 @@ proc pluck*(properties: varargs[cstring]): auto
 
 proc map*(project: proc(value: auto, index: cint): auto): auto
 proc map*(project: proc(value: auto, index: cint): auto, thisArg: auto): auto
+proc mapTo*(value: auto):auto
 
+proc switchAll*(): auto
 proc switchMap*(project: proc(value: auto, index: cint): auto): auto
 proc switchMap*(project: proc(value: auto, index: cint): auto, resultSelector: auto): auto
+proc switchMapTo*(innerObservable: auto, resultSelector: proc(outerValue: auto, innerValue: auto, outerIndex: cint, innerIndex: cint): auto): auto
 
 proc flatMap*(project: proc(value: auto, index: cint): auto): auto
 proc flatMap*(project: proc(value: auto, index: cint): auto, resultSelector: auto): auto
@@ -312,13 +339,24 @@ proc publishReplay*(bufferSize: cint, windowTime: cint): auto
 proc publishReplay*(bufferSize: cint, windowTime: cint, selectorOrScheduler: auto): auto
 proc publishReplay*(bufferSize: cint, windowTime: cint, selectorOrScheduler: auto, scheduler: auto): auto
 
+proc bufferCount*(bufferSize: cint): auto
+proc bufferCount*(bufferSize: cint, startBufferEvery: cint): auto
+proc bufferTime*(bufferTimeSpan: cint): auto
+proc bufferToggle*(openings: auto, closingSelector: proc(value: auto) => auto): auto
+proc bufferWhen*(closingSelector: proc() => Observable): auto
+
 proc materialize*(): auto
 proc catchError*(selector: proc(err: auto, caught: Observable): auto): auto
 proc onErrorResumeNext*(nextSources: varargs[auto]): auto
 proc window*(windowBoundaries: Observable): auto
+proc windowCount*(windowSize: cint, startWindowEvery: cint):auto
+proc windowToggle*(openings: Observable, closingSelector: proc(openValue: auto): Observable): auto
+proc windowWhen*(closingSelector: proc(): Observable): auto
 
 proc elementAt*(index: cint): auto
 proc elementAt*(index: cint, defaultValue: auto): auto
+
+proc endWith*(schedulers: varargs[auto]): auto
 
 proc every*(predicate: proc(value: auto, index: cint): auto): auto
 proc every*(predicate: proc(value: auto, index: cint): auto, thisArg: auto): auto
@@ -349,10 +387,26 @@ proc findIndex*(predicate: proc(value: auto, index: cint, source: auto, thisArg:
 proc first*(predicate: proc(value: auto, index: cint, source: auto): auto)
 proc first*(predicate: proc(value: auto, index: cint, source: auto, defaultValue: auto): auto)
 
+proc finalize*(callback: proc()): auto
+
 proc single*(predicate: proc(value: auto, index: cint, source: auto): auto)
 
 proc multicast*(subjectOrSubjectFactory: auto, selector: proc(source: Observable): Observable): auto
 
+proc delay*(delay: cint): auto
+proc delay*(delay: cint, scheduler: SchedulerLike): auto
+
+proc expand*(project: proc(value: auto, index: cint): any, concurrent: cint): auto
+proc expand*(project: proc(value: auto, index: cint): any, concurrent: cint, scheduler: SchedulerLike): auto
+
 proc observeOn*(scheduler: SchedulerLike): auto
 proc observeOn*(scheduler: SchedulerLike, delay: cint): auto
+
+proc share*():auto
+proc shareReplay*():auto
+proc shareReplay*(configOrBufferSize: cint): auto
+proc shareReplay*(configOrBufferSize: cint, windowTime: cint): auto
+proc shareReplay*(configOrBufferSize: cint, windowTime: cint, scheduler: SchedulerLike): auto
+
+proc ignoreElements*():auto
 {.pop.}
