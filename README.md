@@ -3,6 +3,8 @@
 This library aims to provide [RxJs](https://github.com/ReactiveX/RxJS) 6.5.x bindings for
 Nim (Work In Progress)
 
+See [LearnRxJS](https://www.learnrxjs.io) to learn the mechanics.
+
 ## Factory functions
 
 ```nim
@@ -95,10 +97,12 @@ proc webSocket*(urlConfigOrSource: auto): WebSocketSubject
 
 ## Operators
 
-Bindings exists for the following operators (not yet tested)
+Bindings exists for all the RxJS operators.
+
+See [LearnRxJS operators](https://www.learnrxjs.io/learn-rxjs/operators)
+
 
 ```nim
-
 proc combineAll*(project: varargs[auto]): auto
 proc concatAll*(): auto
 proc combineLatest*(observables: varargs[auto]): auto
@@ -253,109 +257,6 @@ proc multicast*(subjectOrSubjectFactory: auto, selector: proc(source: Observable
 
 proc observeOn*(scheduler: SchedulerLike): auto
 proc observeOn*(scheduler: SchedulerLike, delay: cint): auto
-```
-
-## TODO: Operators
-
-The operators are essential to RxJS. Please help out adding them to the library and testing them out.
-
-```txt
-audit
-auditTimebuffer
-bufferCount
-bufferTime
-bufferToggle
-bufferWhen
-catchError
-combineAll
-concatAll
-concatMap
-concatMapTo
-count
-debounce
-debounceTime
-defaultIfEmpty
-delay
-delayWhen
-dematerialize
-distinct
-distinctUntilChanged
-distinctUntilKeyChanged
-elementAt
-endWith
-every
-exhaust
-exhaustMap
-expand
-filter
-finalize
-find
-findIndex
-first
-flatMap
-groupBy
-ignoreElements
-isEmpty
-last
-map
-mapTo
-materialize
-max
-mergeAll
-mergeMap
-mergeMapTo
-mergeScan
-min
-multicast
-observeOn
-onErrorResumeNext
-pairwise
-pluck
-publish
-publishBehavior
-publishLast
-publishReplay
-reduce
-refCount
-repeat
-repeatWhen
-retry
-retryWhen
-sample
-sampleTime
-scan
-sequenceEqual
-share
-shareReplay
-single
-skip
-skipLast
-skipUntil
-skipWhile
-startWith
-subscribeOn
-switchAll
-switchMap
-switchMapTo
-take
-takeLast
-takeUntil
-takeWhile
-tap
-throttle
-throttleTime
-throwIfEmpty
-timeInterval
-timeout
-timeoutWith
-timestamptoArray
-window
-windowCount
-windowTime
-windowToggle
-windowWhen
-withLatestFrom
-zipAll
 ```
 
 ## Example app

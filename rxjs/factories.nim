@@ -7,29 +7,29 @@ when not defined(js):
 
 {.push importcpp.}
 proc createObservable*(subscribe: proc(args: varargs): auto): Observable {.
-    importjs "Observable.create".}
+    importjs "rxjs.Observable.create".}
 
 proc createConnectableObservable*(subscribe: proc(
     args: varargs): auto): ConnectableObservable {.
-    importjs "ConnectableObservable.create".}
+    importjs "rxjs.ConnectableObservable.create".}
 
 proc createGroupedObservable*(key: auto,
     groupSubject: Subject): GroupedObservable {.
-    importjs "GroupedObservable.create".}
+    importjs "rxjs.GroupedObservable.create".}
 
 proc createAsyncSubject*(subscriber: Subscriber): AsyncSubject {.
-    importjs "AsyncSubject.create".}
+    importjs "rxjs.AsyncSubject.create".}
 
 proc createBehaviorSubject*(value: auto): BehaviorSubject {.
-    importjs "BehaviorSubject.create".}
+    importjs "rxjs.BehaviorSubject.create".}
 
 proc createSubscriber*(next: proc(value: auto)): Subscriber {.
-    importjs "Subscriber.create".}
+    importjs "rxjs.Subscriber.create".}
 proc createSubscriber*(next: proc(value: auto), error: proc(
-    err: auto)): Observable {.importjs "Subscriber.create".}
+    err: auto)): Observable {.importjs "rxjs.Subscriber.create".}
 proc createSubscriber*(next: proc(value: auto), error: proc(err: auto),
-    complete: proc()): Observable {.importjs "Subscriber.create".}
+    complete: proc()): Observable {.importjs "rxjs.Subscriber.create".}
 
 proc createReplaySubject*(bufferSize: cint, windowTime: cint): ReplaySubject {.
-    importjs "ReplaySubject.create".}
+    importjs "rxjs.ReplaySubject.create".}
 {.pop.}
