@@ -4,6 +4,7 @@ This library aims to provide [RxJs](https://github.com/ReactiveX/RxJS) 6.5.x bin
 Nim (Work In Progress)
 
 See [LearnRxJS](https://www.learnrxjs.io) to learn the mechanics.
+Also see [Think Rx](https://thinkrx.io/rxjs/) with a playground included.
 
 ## Factory functions
 
